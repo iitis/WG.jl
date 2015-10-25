@@ -1,8 +1,24 @@
 using Iterators
-include("mninner.jl")
+include("utils.jl")
 
-character_symmetric_group(λ::Vector{Int}, perm_type::Vector{Int}) = mninner(λ, perm_type)
-character_symmetric_group(λ::Vector{Int} = character_at_id(λ)
+function mninner(R::Vector{Int}, v::Vector{Int}, t::Int=1)
+  if t>=length(v)
+    return 1
+  end
+  Χ = 0
+  σ = 1
+  pow = length(find(x->x==0, R))
+  σ *= -1^pow
+  for i=1:length(R)-v[t]+1
+    if R[i] != R[i+v[t]-1] σ *= -1; end
+    if i+v[t] <= length(R) && R[i] == 1 && R[i+v[t]] == 0
+      R[i], R[i+v[t]] = R[i+v[t]], R[i]
+      Χ += σ * mninner(R, v, t+1)
+      R[i], R[i+v[t]] = R[i+v[t]], R[i]
+    end
+  end
+  Χ
+end
 
 # function wg(perm_type::Vector{Int}, d::UInt)
 #   n = sum(perm_type)
