@@ -1,5 +1,5 @@
 function conjugate_partition(λ::Vector{Int})
-  a = zeros(maximum(λ), length(λ))
+  a = zeros(Int64, maximum(λ), length(λ))
   for i=1:length(λ)
     a[1:λ[i], i] = 1
   end
@@ -16,15 +16,26 @@ function character_at_id(λ::Vector{Int})
 end
 
 function schur_poly(λ::Vector{Int}, d::Int)
-  ret = Rational{Int}(1)
-  λ0 = hcat(λ, zeros(d-length(λ)))
+  ret = Rational(1)
+  λ0 = vcat(λ, zeros(Int, d-length(λ)))
   for j=1:d, i=1:j-1
-    ret *= (λ[i] - λ[j] +j - i)//(j - i)
+    ret *= (λ0[i] - λ0[j] + j - i)//(j - i)
   end
-  ret
+  ret::Rational
 end
 
-character_symmetric_group(λ::Vector{Int}, perm_type::Vector{Int}) = mninner(λ, perm_type)
-character_symmetric_group(λ::Vector{Int} = character_at_id(λ)
+function binary_partition(λ::Vector{Int})
+  λr = reverse(λ)
+  unshift!(λr, 0)
+  mapreduce(x->[ones(Int, x), 0], vcat, diff(λr))
+end
 
+function partitions_up_to_length(n, d)
+  @task for i=1:d, λ in partitions(n, i)
+    produce(λ)
+  end
+end
+
+character_symmetric_group(λ::Vector{Int}, perm_type::Vector{Int}) = mninner(binary_partition(λ), perm_type)
+character_symmetric_group(λ::Vector{Int}) = character_at_id(λ)
 
