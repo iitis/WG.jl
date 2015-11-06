@@ -27,7 +27,7 @@ end
 function binary_partition(λ::Vector{Int})
   λr = reverse(λ)
   unshift!(λr, 0)
-  mapreduce(x->[ones(Int, x), 0], vcat, diff(λr))
+  mapreduce(x->[ones(Int, x); 0], vcat, diff(λr))
 end
 
 function partitions_up_to_length(n, d)
@@ -38,4 +38,3 @@ end
 
 character_symmetric_group(λ::Vector{Int}, perm_type::Vector{Int}) = mninner(binary_partition(λ), perm_type)
 character_symmetric_group(λ::Vector{Int}) = character_at_id(λ)
-
